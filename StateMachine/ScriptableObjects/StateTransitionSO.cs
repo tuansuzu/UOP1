@@ -15,11 +15,13 @@ namespace UOP1.StateMachine.ScriptableObjects
 			if (createdInstances.TryGetValue(this, out var obj))
 				return (StateTransition)obj;
 
+			var transition = new StateTransition();
+			createdInstances.Add(this, transition);
+
 			var state = _targetState.GetState(stateMachine, createdInstances);
 			ProcessConditionUsages(stateMachine, _conditions, createdInstances, out var conditions, out var resultGroups);
 
-			var transition = new StateTransition(state, conditions, resultGroups);
-			createdInstances.Add(this, transition);
+			transition.Init(state, conditions, resultGroups);
 			return transition;
 		}
 
@@ -40,8 +42,8 @@ namespace UOP1.StateMachine.ScriptableObjects
 			List<int> resultGroupsList = new List<int>();
 			for (int i = 0; i < count; i++)
 			{
-				int idx = i;
 				resultGroupsList.Add(1);
+				int idx = resultGroupsList.Count - 1;
 				while (i < count - 1 && conditionUsages[i].Operator == Operator.And)
 				{
 					i++;
